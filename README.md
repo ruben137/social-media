@@ -13,6 +13,7 @@
 <ul>
   <li>Authentication system</li>
   <li>Create, Edit, and delete Posts</li>
+  <li>Infinite-scroll pagination</li>
   <li>Search and find users by their usernames</li>
   <li>Like and dislikes posts</li>
   <li>Comment posts and also like or dislike comments</li>
