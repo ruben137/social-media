@@ -9,7 +9,7 @@
 
 
 <h1><b>Introduction</b></h1>
-<p>In this MERN stack project I created a social media with the following features:</p>
+<p>In this MERN stack project, I created a social media with the following features:</p>
 <ul>
   <li>Authentication system</li>
   <li>Create, Edit, and delete Posts</li>
