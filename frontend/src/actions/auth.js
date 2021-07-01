@@ -9,13 +9,14 @@ export const signin = (formData, router) => async (dispatch) => {
 
     router.push("/");
   } catch (error) {
-    dispatch({type:SIGNIN_FAIL,payload:
-      error.response && error.response.data.message
+    dispatch({
+      type: SIGNIN_FAIL,
+      payload:
+        error.response && error.response.data.message
           ? error.response.data.message
           : error.message,
-    })
-    console.log(error)
-    
+    });
+    console.log(error);
   }
 };
 
@@ -30,7 +31,6 @@ export const signup = (formData, router) => async (dispatch) => {
     dispatch({
       type: AUTH_FAIL,
       payload:
-
         error.response && error.response.data.message
           ? error.response.data.message
           : error.message,
