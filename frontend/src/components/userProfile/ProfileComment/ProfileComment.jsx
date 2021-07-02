@@ -5,14 +5,13 @@ import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import moment from "moment";
-import * as api from "../../../api/index";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { deleteComment, likeComment } from "../../../actions/userProfile";
+
 
 const ProfileComment = ({
   comment,
-  setComments,
-  comments,
   user,
   deleteNotification,
   index,
@@ -21,7 +20,8 @@ const ProfileComment = ({
   logUser,
   setCommentData,
   setIndex,
-  setShowImage
+  setOpen
+
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMenuOpen = (e) => {
@@ -32,16 +32,52 @@ const ProfileComment = ({
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
-  const deleteCurrentComment = async () => {
-    setAnchorEl(null);
-    const { data } = await api.deleteComment(commentId);
-    setComments(comments.filter((comment) => comment._id !== data));
-    setCommentData("");
-    await dispatch(deleteNotification(userPosts[index]._id, logUser?.result?.userName,"comment"));
+  const handleLikeComment = async () => {
+    dispatch(likeComment(comment._id));
+
+    if (comment.from === user?.result?.userName) return;
+
+    if (comment.likes.includes(user?.result?.userName)) {
+      await dispatch(
+        deleteNotification(
+          userPosts[index]._id,
+          logUser?.result?.userName,
+          "likeComment"
+        )
+      );
+    } else {
+      console.log(comment.from);
+      await dispatch(
+        newNotification({
+          notificationId: userPosts[index]._id,
+          type: "likeComment",
+          from: user?.result?.userName,
+          to: comment.from,
+          notification: `${user?.result?.userName} liked your comment`,
+        })
+      );
+    }
+
     socket.emit("send-notification", {
-      notification: "new comment",
-      receiver: userPosts[index].name,
+      notification: "new like",
+      receiver: comment.from,
     });
+  };
+  const deleteCurrentComment = async() => {
+    setAnchorEl(null);
+    dispatch(deleteComment(commentId));
+
+    setCommentData("");
+    dispatch(
+      deleteNotification(
+{        id:userPosts[index]._id,
+        from:logUser?.result?.userName,
+        type:"comment",
+        socket,
+        receiver:userPosts[index].name}
+      )
+    );
+
   };
   const isMenuOpen = Boolean(anchorEl);
   const menuId = "primary-search-account-menu";
@@ -71,20 +107,22 @@ const ProfileComment = ({
     >
       <Avatar src={comment.profilePic} />
 
-            <Typography        
-          component={Link}
-          to={`/profile/${comment.from}`}
-          onClick={()=>{
-            setShowImage(false)
-            setIndex(null)
-          }}
-              style={{
+      <Typography
+        component={Link}
+        to={`/profile/${comment.from}`}
+        onClick={() => {
+          setOpen(false)
+          setIndex(null);
+        }}
+        style={{
           fontWeight: 700,
           marginLeft: 5,
-          textDecoration:'none',
-          color:'#182C61'
+          textDecoration: "none",
+          color: "#182C61",
         }}
-          >{comment.from}</Typography>
+      >
+        {comment.from}
+      </Typography>
       <span
         style={{
           marginLeft: 5,
@@ -104,41 +142,7 @@ const ProfileComment = ({
           justifyContent: "space-between",
         }}
       >
-        <Button
-          style={{ position: "relative" }}
-          onClick={async () => {
-            const { data } = await api.likeComment(comment._id);
-            setComments(
-              comments.map((comment) =>
-                comment._id === data._id ? data : comment
-              )
-            );
-
-            if (comment.from === user?.result?.userName) return;
-
-            if (comment.likes.includes(user?.result?.userName)) {
-              await dispatch(
-                deleteNotification(userPosts[index]._id, logUser?.result?.userName,"likeComment")
-              );
-            } else {
-              console.log(comment.from);
-              await dispatch(
-                newNotification({
-                  notificationId: userPosts[index]._id,
-                  type: "likeComment",
-                  from: user?.result?.userName,
-                  to: comment.from,
-                  notification: `${user?.result?.userName} liked your comment`,
-                })
-              );
-            }
-
-            socket.emit("send-notification", {
-              notification: "new like",
-              receiver: comment.from,
-            });
-          }}
-        >
+        <Button style={{ position: "relative" }} onClick={handleLikeComment}>
           {comment.likes.find((user) => user === logUser?.result?.userName) ? (
             <>
               <FavoriteIcon fontSize="small" color="secondary" />

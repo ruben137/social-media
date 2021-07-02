@@ -4,27 +4,26 @@ import Post from "./Post/Post";
 import { useSelector, useDispatch } from "react-redux";
 import { Card, CardContent, Typography } from "@material-ui/core";
 import LoadingPost from "./Post/LoadingPost";
-import { getMorePosts, getPosts, getUser } from "../../actions/posts";
+import { getUser } from "../../actions/posts";
 import { useStyles } from "./styles";
 import { useHistory } from "react-router";
+import useInfinityScroll from "../../customHooks/useInfinityScroll";
 
 const Posts = () => {
   const dispatch = useDispatch();
   const logUser = JSON.parse(localStorage.getItem("profile"));
-  const posts = useSelector((state) => state.posts);
   const user = useSelector((state) => state?.user);
   const loader = useRef(null);
   const classes = useStyles();
   const history = useHistory();
 
-  const [prevent, setPrevent] = useState(false);
   const [skip, setSkip] = useState(0);
   const [currentId, setCurrentId] = useState(0);
+  const { posts ,noMore} = useInfinityScroll(skip, dispatch);
 
   useEffect(() => {
     if (!logUser) {
       history.push("/auth");
-      setPrevent(false);
     }
   }, [history, logUser]);
 
@@ -32,38 +31,16 @@ const Posts = () => {
     dispatch(getUser(logUser?.result?.userName));
   }, [dispatch, logUser?.result?.userName]);
 
-  const getMore = useCallback(
-    (amount) => {
-      dispatch(getMorePosts(amount));
-    },
-    [dispatch]
-  );
-
-  useEffect(() => {
-    dispatch(getPosts(0));
-  }, [dispatch]);
-
   const handleObserver = useCallback((entries) => {
     const target = entries[0];
     if (target.isIntersecting) {
-
       setSkip((prev) => prev + 5);
     }
   }, []);
 
-  useEffect(() => {
-    if (posts.includes("no-posts")) setPrevent(true);
-  }, [posts]);
+
 
   useEffect(() => {
-    if (skip === 0) return;
-    if (prevent) return;
-    getMore(skip);
-  }, [skip, prevent, getMore]);
-
-  useEffect(() => {
-    
-
     const option = {
       root: null,
       rootMargin: "20px",
@@ -95,8 +72,11 @@ const Posts = () => {
             currentId={currentId}
           />
         ))}
-        <div style={{display:posts.length?'block':'none'}} ref={loader} />
-        {prevent ? (
+        <div
+          style={{ display: posts.length ? "block" : "none" }}
+          ref={loader}
+        />
+        {noMore ? (
           <Card align="center" className={classes.noMore}>
             <CardContent>
               <Typography>There are no more posts to show</Typography>

@@ -36,7 +36,7 @@ import * as api from "../../../api/index";
 
 const Post = ({ setCurrentId, post, currentId }) => {
   const posts = useSelector((state) =>
-    currentId ? state.posts.find((post) => post._id === currentId) : null
+    currentId ? state.postsState.posts.find((post) => post._id === currentId) : null
   );
 
   const [comments, setComments] = useState([]);

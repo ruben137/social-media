@@ -42,27 +42,16 @@ export const getUser = (user) => async (dispatch) => {
 export const getPosts = (skip) => async (dispatch) => {
   try {
     const { data } = await api.fetchPosts(skip);
+    if(data.length)dispatch({ type: FETCH_ALL, payload: data });
+    if(!data.length) dispatch({type:NO_DATA,payload:true})
 
-    dispatch({ type: FETCH_ALL, payload: data });
+ 
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getMorePosts=(skip)=>async(dispatch)=>{
-    try {
-    const { data } = await api.fetchPosts(skip);
-    if(data.length){
-      dispatch({ type: FETCH_MORE, payload: data });
 
-    }else{
-      dispatch({type:NO_DATA,payload:'no-posts'})
-    }
-
-  } catch (error) {
-    console.log(error);
-  }
-}
 
 export const getUserNotifications = (user) => async (dispatch) => {
   try {

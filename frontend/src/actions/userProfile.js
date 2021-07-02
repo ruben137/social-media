@@ -1,5 +1,5 @@
 import * as api from "../api/index.js";
-import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION } from "../constants/actionTypes";
+import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE, LIKE_USER_PROFILE_COMMENT} from "../constants/actionTypes";
 
 export const follow = (id) => async (dispatch) => {
   dispatch({ type: FOLLOW_REQUEST, payload: { id } });
@@ -30,5 +30,70 @@ export const getUserPosts = (user) => async (dispatch) => {
   }
 };
 
+
+export const getUserPost = (id) => async (dispatch) => {
+  try {
+    const comments = await api.getComments(id);
+    const likes = await api.getLikes(id);
+    dispatch({
+      type: GET_USER_POST,
+      payload: { comments: comments.data, likes: likes.data },
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const likePost=(id)=>async(dispatch)=>{
+  try {
+        const { data } = await api.likePost(id);
+        dispatch({type:LIKE_USER_POST,payload:data})
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+ export const dislikePost =(id)=> async (dispatch) => {
+    try {
+      const { data } = await api.dislikePost(id);
+      dispatch({type:DISLIKE_USER_POST,payload:data})
+  
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  export const commentPost =
+    ({ comment, from, commentId }) =>
+    async (dispatch) => {
+      try {
+        const { data } = await api.commentPost({
+          comment,
+          from,
+          commentId,
+        });
+        dispatch({ type: COMMENT_USER_POST, payload: data });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+ export const deleteComment=(id)=>async(dispatch)=>{
+   try {
+      const { data } = await api.deleteComment(id);
+      dispatch({type:DELETE_USER_PROFILE_COMMENT,payload:data})
+   } catch (error) {
+      console.log(error);
+   }
+ }
+
+ export const likeComment=(id)=>async(dispatch)=>{
+   try {
+     const {data}=await api.likeComment(id);
+     dispatch({type:LIKE_USER_PROFILE_COMMENT,payload:data})
+   } catch (error) {
+       console.log(error);
+   }
+ }
 
 
