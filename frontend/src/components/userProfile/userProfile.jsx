@@ -9,13 +9,15 @@ import {
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { getUser, getUsers } from "../../actions/posts";
-import { getUserPosts } from "../../actions/userProfile";
+import { getUser } from "../../actions/posts";
+
 import { useStyles } from "./styles";
 import { useHistory, useParams } from "react-router";
 import UserInfo from "./UserInfo/UserInfo";
 import PictureModal from "./PictureModal/PictureModal";
 import { useInfinityScrollProfile } from "../../customHooks/useInfinityScroll";
+import { clearUserProfileState } from "../../actions/userProfile";
+
 
 const UserProfile = () => {
   const params = useParams();
@@ -23,10 +25,10 @@ const UserProfile = () => {
   const logUser = JSON.parse(localStorage.getItem("profile"));
   const classes = useStyles();
   const dispatch = useDispatch();
-const loader=useRef()
+  const loader = useRef()
   const user = useSelector((state) => state.user);
-const [skip, setSkip] = useState(0);
-const {userPosts}=useInfinityScrollProfile(skip,params.id,dispatch)
+  const [skip, setSkip] = useState(0);
+  const { userPosts } = useInfinityScrollProfile(skip, params.id, dispatch)
 
   useEffect(() => {
     if (!logUser) {
@@ -34,22 +36,23 @@ const {userPosts}=useInfinityScrollProfile(skip,params.id,dispatch)
     }
   }, [history, logUser]);
 
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
+
 
   const { error } = user;
 
-  // const userPostsState = useSelector((state) => state.userPosts);
-  // const { userPosts } = userPostsState;
+
 
   useEffect(() => {
     dispatch(getUser(params?.id));
+    return () => {
+      dispatch(clearUserProfileState())
+      setSkip(0)
+    }
   }, [dispatch, params?.id]);
 
 
 
-    const handleObserver = useCallback((entries) => {
+  const handleObserver = useCallback((entries) => {
     const target = entries[0];
     if (target.isIntersecting) {
       setSkip((prev) => prev + 5);
@@ -107,7 +110,7 @@ const {userPosts}=useInfinityScrollProfile(skip,params.id,dispatch)
                     md={6}
                     lg={4}
                     style={{ padding: 20, height: 250 }}
-                    onClick={() => {}}
+                    onClick={() => { }}
                   >
                     <PictureModal
                       img={img}
@@ -118,7 +121,7 @@ const {userPosts}=useInfinityScrollProfile(skip,params.id,dispatch)
                 ))}
             </Grid>
           </Card>
-          <div style={{ display: userPosts.length ? "block" : "none" }} ref={loader}/>
+          <div style={{ display: userPosts.length ? "block" : "none" }} ref={loader} />
         </Container>
       ) : (
         <Container>

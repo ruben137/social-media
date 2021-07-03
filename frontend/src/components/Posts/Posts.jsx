@@ -8,6 +8,7 @@ import { getUser } from "../../actions/posts";
 import { useStyles } from "./styles";
 import { useHistory } from "react-router";
 import useInfinityScroll from "../../customHooks/useInfinityScroll";
+import NoPosts from "./Post/NoPosts/NoPosts";
 
 const Posts = () => {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ const Posts = () => {
       ) : null}
 
       {!posts.length ? <LoadingPost user={user} /> : <span></span>}
+      {user?.following?.length<1&&<NoPosts/>}
       <div className={classes.postsContainer}>
         {filterPosts.map((post, i) => (
           <Post
@@ -86,6 +88,7 @@ const Posts = () => {
           <span></span>
         )}
       </div>
+
     </>
   );
 };

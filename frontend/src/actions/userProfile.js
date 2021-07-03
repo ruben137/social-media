@@ -1,5 +1,5 @@
 import * as api from "../api/index.js";
-import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE, LIKE_USER_PROFILE_COMMENT, NO_DATA} from "../constants/actionTypes";
+import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE_USER_PROFILE_COMMENT, NO_DATA,GET_PROFILE_PIC, CLEAN_USER_PROFILE_STATE} from "../constants/actionTypes";
 
 export const follow = (id) => async (dispatch) => {
   dispatch({ type: FOLLOW_REQUEST, payload: { id } });
@@ -96,6 +96,23 @@ export const likePost=(id)=>async(dispatch)=>{
      dispatch({type:LIKE_USER_PROFILE_COMMENT,payload:data})
    } catch (error) {
        console.log(error);
+   }
+ }
+
+ export const getProfilePic=(user)=>async(dispatch)=>{
+   try {
+     const {data}=await api.getProfilePic(user)
+     dispatch({type:GET_PROFILE_PIC,payload:data,user})
+   } catch (error) {
+     console.log(error)
+   }
+ }
+
+ export const clearUserProfileState=()=>async(dispatch)=>{
+   try {
+     dispatch({type:CLEAN_USER_PROFILE_STATE})
+   } catch (error) {
+     console.log(error)
    }
  }
 

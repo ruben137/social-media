@@ -30,15 +30,21 @@ import {
 
 import { useStyles } from "./styles";
 import socket from "../Messages/SocketProvider";
+import { getProfilePic } from "../../actions/userProfile";
 
 export default function PrimarySearchAppBar() {
-  const profilePic = useSelector((state) => state.user.profilePic);
+  const userPostsState = useSelector((state) => state.userPosts);
+  const { users } = userPostsState;
+
+ 
   const notifications = useSelector((state) => state.notifications);
   const messageNotifications = notifications.filter(
     (notification) => notification.type === "message"
   );
+
   const search = useSelector((state) => state.search);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
+  const currentUser = users.find((item) => item.name === user?.result?.userName);
 
   const [showSearch, setShowSearch] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -60,6 +66,10 @@ export default function PrimarySearchAppBar() {
   useEffect(() => {
     document.addEventListener("mousedown", handleClick);
   }, []);
+
+  useEffect(() => {
+  dispatch(getProfilePic(user?.result?.userName))
+  }, [])
 
   const handleClick = (e) => {
     if (node?.current?.contains(e.target)) {
@@ -295,7 +305,7 @@ export default function PrimarySearchAppBar() {
           <Avatar
             className={classes.purple}
             alt={user?.result.name}
-            src={profilePic}
+            src={currentUser?.profilePic}
           >
             {user?.result.name.charAt(0)}
           </Avatar>
@@ -393,7 +403,7 @@ export default function PrimarySearchAppBar() {
               <Avatar
                 className={classes.purple}
                 alt={user?.result.name}
-                src={profilePic}
+                src={currentUser?.profilePic}
               >
                 {user?.result.name.charAt(0)}
               </Avatar>

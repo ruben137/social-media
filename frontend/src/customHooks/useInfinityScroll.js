@@ -21,13 +21,14 @@ function useInfinityScroll(page, dispatch) {
 export const useInfinityScrollProfile = (page, user, dispatch) => {
   const { userPosts ,noMore} = useSelector((state) => state.userPosts);
   const sendQuery = useCallback(() => {
-  
+
     if(!noMore)dispatch(getUserPosts(user, page));
   }, [dispatch, page, user,noMore]);
 
   useEffect(() => {
     sendQuery();
-  }, [sendQuery, page]);
+ 
+  }, [dispatch,sendQuery, page,user]);
 
   return { userPosts };
 };

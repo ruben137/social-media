@@ -2,14 +2,14 @@ import {
   Box,
   Card,
   CardContent,
-  CircularProgress,
   Container,
-
+  Typography,
 } from "@material-ui/core";
-import React from "react";
-import { useStyles } from "./styles";
+ 
 
-const LoadingPost = () => {
+import { useStyles } from "../../styles";
+
+const NoPosts = () => {
   const classes = useStyles();
   return (
     <Box className={classes.box}>
@@ -23,7 +23,9 @@ const LoadingPost = () => {
           }}
         >
           <CardContent>
-            <CircularProgress />
+            <Typography style={{ fontSize: 30 }}>
+              Start following people to see their posts!
+            </Typography>
           </CardContent>
         </Card>
       </Container>
@@ -31,4 +33,4 @@ const LoadingPost = () => {
   );
 };
 
-export default LoadingPost;
+export default NoPosts;
