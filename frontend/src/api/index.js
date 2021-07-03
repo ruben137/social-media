@@ -29,7 +29,7 @@ export const likeComment = (id) => API.patch(`/comments/${id}`);
 // User
 export const getUsers = () => API.get("/userProfile");
 export const getUser = (user) => API.get(`/userProfile/${user}`);
-export const getUserPosts = (user) => API.get(`/userProfile/userPosts/${user}`);
+export const getUserPosts = (user,skip) => API.get(`/userProfile/userPosts/${user}/${skip}`);
 export const follow = (id) => API.put(`/userProfile/follow/${id}`);
 export const getUserNotifications = (user) =>
   API.get(`/posts/notifications/${user}`);
@@ -50,7 +50,7 @@ export const getNotifications = (user) =>
 export const newNotification = (notification) =>
   API.post(`/posts/newNotification`, notification);
 export const deleteNotification = (id, from, type) =>
-  API.delete(`/posts/notifications/${id}/${from}/${type}`);
+  API.delete(`/posts/deleteNotification/${id}/${from}/${type}`);
 export const deleteMessageNotifications = (id, type, from) =>
   API.delete(`/messages/deleteMessageNotifications/${id}/${type}/${from}`);
 

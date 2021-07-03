@@ -1,4 +1,10 @@
-import { DELETE_NOTIFICATION, GET_NOTIFICATIONS, NEW_NOTIFICATION, SEARCH_USER,DELETE_MESSAGE_NOTIFICATION } from "../constants/actionTypes";
+import {
+  DELETE_NOTIFICATION,
+  GET_NOTIFICATIONS,
+  NEW_NOTIFICATION,
+  SEARCH_USER,
+  DELETE_MESSAGE_NOTIFICATION,
+} from "../constants/actionTypes";
 import * as api from "../api/index.js";
 export const searchUser = (query) => async (dispatch) => {
   try {
@@ -9,19 +15,22 @@ export const searchUser = (query) => async (dispatch) => {
   }
 };
 
-export const deleteNotification = ({id,from,type,socket,receiver}) => async (dispatch) => {
-  try {
-    await api.deleteNotification(id,from,type);
-     socket.emit("send-notification", {
-      notification: "new comment",
-      receiver,
-    });
-    dispatch({ type: DELETE_NOTIFICATION, payload: id });
+export const deleteNotification =
+  ({ _id, from, type, socket, receiver }) =>
+  async (dispatch) => {
+    try {
+      await api.deleteNotification(_id, from, type);
+      if (socket)
+        socket.emit("send-notification", {
+          notification: "new comment",
+          receiver,
+        });
 
-  } catch (error) {
-    console.log(error.response);
-  }
-};
+      dispatch({ type: DELETE_NOTIFICATION, payload: _id });
+    } catch (error) {
+      console.log(error.response);
+    }
+  };
 
 export const getNotifications = (user) => async (dispatch) => {
   try {
@@ -44,7 +53,7 @@ export const newNotification = (notification) => async (dispatch) => {
 export const deleteMessageNotifications =
   (id, type, user) => async (dispatch) => {
     try {
-     await api.deleteMessageNotifications(id, type, user);
+      await api.deleteMessageNotifications(id, type, user);
       dispatch({ type: DELETE_MESSAGE_NOTIFICATION, payload: id });
     } catch (error) {
       console.log(error.response);

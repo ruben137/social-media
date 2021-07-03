@@ -13,7 +13,7 @@ router.get('/notifications',auth,getNotifications)
 router.patch('/delete/:index',auth, deleteNotification);
 router.get('/search/:query',searchUser)
 router.get('/:name',getUser)
-router.get('/userPosts/:name',getUserPosts)
+router.get('/userPosts/:name/:skip',getUserPosts)
 router.put('/:id',auth,updateProfile)
 router.put('/follow/:id',auth,follow)
 router.get('/getpic/:name',getProfilePic)

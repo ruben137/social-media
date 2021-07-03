@@ -218,19 +218,17 @@ export default function PrimarySearchAppBar() {
 
       {notifications.length ? (
         notifications.map((item, i) => (
-          <MenuItem key={i} style={{display:'flex'}}>
-            <FavoriteIcon color="secondary"/>
-            <span style={{flexGrow:1}}>{item.notification}</span>
+          <MenuItem key={i} style={{ display: "flex" }}>
+            <FavoriteIcon color="secondary" />
+            <span style={{ flexGrow: 1 }}>{item.notification}</span>
             <Button>
               <CloseIcon
-              
-                onClick={async () =>
-                  await dispatch(deleteNotification(item._id))
-                }
-                />
+                onClick={async () => {
+                  await dispatch(deleteNotification(item));
+                }}
+              />
             </Button>
           </MenuItem>
-             
         ))
       ) : (
         <span></span>
@@ -419,8 +417,3 @@ export default function PrimarySearchAppBar() {
     </div>
   );
 }
-
-
-
-
-

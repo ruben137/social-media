@@ -68,7 +68,7 @@ const Posts = () => {
           <Post
             key={i}
             post={post}
-            setCurrentId={setCurrentId}
+      
             currentId={currentId}
           />
         ))}

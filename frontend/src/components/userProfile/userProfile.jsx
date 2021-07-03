@@ -6,7 +6,7 @@ import {
   Grid,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, getUsers } from "../../actions/posts";
@@ -15,6 +15,7 @@ import { useStyles } from "./styles";
 import { useHistory, useParams } from "react-router";
 import UserInfo from "./UserInfo/UserInfo";
 import PictureModal from "./PictureModal/PictureModal";
+import { useInfinityScrollProfile } from "../../customHooks/useInfinityScroll";
 
 const UserProfile = () => {
   const params = useParams();
@@ -22,8 +23,10 @@ const UserProfile = () => {
   const logUser = JSON.parse(localStorage.getItem("profile"));
   const classes = useStyles();
   const dispatch = useDispatch();
-
+const loader=useRef()
   const user = useSelector((state) => state.user);
+const [skip, setSkip] = useState(0);
+const {userPosts}=useInfinityScrollProfile(skip,params.id,dispatch)
 
   useEffect(() => {
     if (!logUser) {
@@ -37,16 +40,33 @@ const UserProfile = () => {
 
   const { error } = user;
 
-  const userPostsState = useSelector((state) => state.userPosts);
-  const { userPosts } = userPostsState;
+  // const userPostsState = useSelector((state) => state.userPosts);
+  // const { userPosts } = userPostsState;
 
   useEffect(() => {
     dispatch(getUser(params?.id));
   }, [dispatch, params?.id]);
 
+
+
+    const handleObserver = useCallback((entries) => {
+    const target = entries[0];
+    if (target.isIntersecting) {
+      setSkip((prev) => prev + 5);
+    }
+  }, []);
+
+
+
   useEffect(() => {
-    dispatch(getUserPosts(params?.id));
-  }, [dispatch, params?.id]);
+    const option = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 0,
+    };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (loader.current) observer.observe(loader.current);
+  }, [handleObserver]);
 
   const { username } = userPosts;
 
@@ -98,6 +118,7 @@ const UserProfile = () => {
                 ))}
             </Grid>
           </Card>
+          <div style={{ display: userPosts.length ? "block" : "none" }} ref={loader}/>
         </Container>
       ) : (
         <Container>

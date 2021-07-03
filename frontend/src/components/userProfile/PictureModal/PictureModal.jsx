@@ -75,6 +75,8 @@ export default function PictureModal({ img, userPosts, currentIndex }) {
     });
   };
 
+
+
   return (
     <>
       <img

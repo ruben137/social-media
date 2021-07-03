@@ -4,13 +4,23 @@ import {
   FETCH_ALL,
   DELETE,
   UPDATE,
-  LIKE,
+ 
   FETCH_USER_NOTIFICATIONS,
   GET_USER,
   USER_NOT_FOUND,
   GET_USERS,
-  FETCH_MORE,
-  NO_DATA
+  NO_DATA,
+  COMMENT_POST,
+  GET_COMMENTS,
+
+  DELETE_COMMENT,
+
+  LIKE_COMMENT,
+  GET_LIKES,
+ LIKE_POST,
+ DISLIKE_POST
+ 
+ 
 
 } from "../constants/actionTypes.js";
 
@@ -91,15 +101,82 @@ export const updatePost = (id, updatedPost) => async (dispatch) => {
   }
 };
 
-export const likePost = (id, name) => async (dispatch) => {
-  try {
-    const { data } = await api.likePost(id, name);
 
-    dispatch({ type: LIKE, payload: data });
+
+export const getComments=(id)=>async (dispatch)=>{
+  try {
+    const { data } = await api.getComments(id);
+    dispatch({type:GET_COMMENTS,payload:data,id})
   } catch (error) {
-    console.log(error.response);
+    console.log(error)
   }
 };
+
+  export const commentPost =
+    ({ comment, from, commentId,postId }) =>
+    async (dispatch) => {
+      try {
+        const { data } = await api.commentPost({
+          comment,
+          from,
+          commentId,
+        });
+        dispatch({ type: COMMENT_POST, payload: data ,id:postId});
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+export const deleteComment=({commentId,id})=>async(dispatch)=>{
+  try {
+  const { data } = await api.deleteComment(commentId);
+  dispatch({type:DELETE_COMMENT,payload:data,id})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const likeComment=({postId,commentId})=>async(dispatch)=>{
+  try {
+    const {data}=await api.likeComment(commentId)
+    dispatch({type:LIKE_COMMENT,payload:data,id:postId})
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const getLikes=(id)=>async(dispatch)=>{
+  try {
+    const {data}=await api.getLikes(id)
+    dispatch({type:GET_LIKES,payload:data,id})
+  } catch (error) {
+        console.log(error)
+  }
+}
+
+export const likePost =
+  ({ from, likeId }) =>
+  async (dispatch) => {
+    try {
+      const { data } = await api.likePost({
+        from,
+        likeId,
+      });
+      dispatch({ type: LIKE_POST, payload: data,id:likeId });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+export const dislikePost = (id, postId) => async (dispatch) => {
+  try {
+    const { data } = await api.dislikePost(id);
+    dispatch({ type: DISLIKE_POST, payload: data, id: postId });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 
 

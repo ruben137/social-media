@@ -5,6 +5,7 @@ import {
   FETCH_USER_POST,
   LIKE_USER_POST,
    LIKE_USER_PROFILE_COMMENT,
+   NO_DATA,
 } from "../constants/actionTypes";
 import { GET_USER_POST } from "../constants/actionTypes";
 
@@ -13,6 +14,7 @@ const initialState = {
   userPost: {
     likes: [],
     comments: [],
+    noMore:false
   },
 };
 export const userPosts = (state = initialState, action) => {
@@ -20,8 +22,13 @@ export const userPosts = (state = initialState, action) => {
     case FETCH_USER_POST:
       return {
         ...state,
-        userPosts: action.payload,
+        userPosts: [...state.userPosts,...action.payload]
       };
+    case NO_DATA:
+      return{
+        ...state,
+        noMore:true
+      }
     case GET_USER_POST:
       return {
         ...state,

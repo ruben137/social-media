@@ -59,13 +59,17 @@ export const follow = async (req, res) => {
 };
 
 export const getUserPosts = async (req, res) => {
-  const { name } = req.params;
+  const { name,skip } = req.params;
   try {
     const user = await userModel.findOne({ userName: name });
 
     if (!user) return res.status(404).json({ message: "no user" });
 
-    const userPosts = await postModel.find({ name }).sort({ createdAt: -1 });
+    const userPosts = await postModel
+    .find({ name })
+    .limit(6)
+    .skip(+skip)
+    .sort({ createdAt: -1 });
 
     if (!userPosts.length) return res.status(200).json({ username: user });
 

@@ -17,7 +17,16 @@ import Typography from "@material-ui/core/Typography";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import { useStyles } from "./styles";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-import { deletePost, updatePost } from "../../../actions/posts";
+import {
+  commentPost,
+  deleteComment,
+  deletePost,
+  dislikePost,
+  getComments,
+  getLikes,
+  likePost,
+  updatePost,
+} from "../../../actions/posts";
 import {
   newNotification,
   deleteNotification,
@@ -32,14 +41,23 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import socket from "../../Messages/SocketProvider";
 import Comment from "./Comment/Comment";
-import * as api from "../../../api/index";
 
-const Post = ({ setCurrentId, post, currentId }) => {
-  const posts = useSelector((state) =>
-    currentId ? state.postsState.posts.find((post) => post._id === currentId) : null
+
+const Post = ({ post }) => {
+  const [currentId, setCurrentId] = useState(null);
+  const currentPost = useSelector((state) =>
+    currentId
+      ? state.postsState.posts.find((post) => post._id === currentId)
+      : null
   );
-
-  const [comments, setComments] = useState([]);
+  const { comments } = useSelector((state) =>
+    currentId
+      ? state.postsState.posts.find((item) => item._id === currentId)
+      : []
+  );
+  const { likes } = useSelector((state) =>
+    state.postsState.posts.find((item) => item._id === post._id)
+  );
 
   const user = JSON.parse(localStorage.getItem("profile"));
   const classes = useStyles();
@@ -47,16 +65,16 @@ const Post = ({ setCurrentId, post, currentId }) => {
   const [expanded, setExpanded] = useState(false);
   const [commentMode, setCommentMode] = useState(false);
   const [commentId, setCommentId] = useState("");
-
-  const [likes, setLikes] = useState([]);
   const [edit, setEdit] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [postData, setPostData] = useState({ message: "", tags: "" });
   const [commentData, setCommentData] = useState("");
 
+
+
   useEffect(() => {
-    if (posts) setPostData(posts);
-  }, [posts]);
+    if (currentPost) setPostData(currentPost);
+  }, [currentPost]);
 
   const isMenuOpen = Boolean(anchorEl);
   const handleProfileMenuOpen = (e) => {
@@ -78,33 +96,22 @@ const Post = ({ setCurrentId, post, currentId }) => {
     dispatch(deletePost(post._id));
   };
   useEffect(() => {
-    const getLikes = async () => {
-      try {
-        const { data } = await api.getLikes(post._id);
-        setLikes(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getLikes();
-  }, [post._id]);
+    dispatch(getLikes(post._id));
+  }, [dispatch, post._id]);
 
   const deleteCurrentComment = async () => {
     setAnchorEl(null);
-    try {
-      const { data } = await api.deleteComment(commentId);
-      setComments(comments.filter((comment) => comment._id !== data));
-    } catch (error) {
-      console.log(error);
-    }
+    dispatch(deleteComment({ commentId, id: currentId }));
     setCommentData("");
-    await dispatch(
-      deleteNotification(post._id, user?.result?.userName, "comment")
-    );
-    socket.emit("send-notification", {
-      notification: "new comment",
-      receiver: post.name,
-    });
+    if (post.name !== user?.result?.userName) {
+      await dispatch(
+        deleteNotification(post._id, user?.result?.userName, "comment")
+      );
+      socket.emit("send-notification", {
+        notification: "new comment",
+        receiver: post.name,
+      });
+    }
   };
 
   const handleSubmit = (e) => {
@@ -125,16 +132,14 @@ const Post = ({ setCurrentId, post, currentId }) => {
     e.preventDefault();
 
     if (commentData.trim() === "") return;
-    try {
-      const { data } = await api.commentPost({
+    dispatch(
+      commentPost({
         comment: commentData,
         from: user.result.userName,
         commentId: currentId,
-      });
-      setComments([...comments, data]);
-    } catch (error) {
-      console.log(error);
-    }
+        postId: currentId,
+      })
+    );
 
     setCommentData("");
     if (user.result.userName === post.name) return;
@@ -187,23 +192,23 @@ const Post = ({ setCurrentId, post, currentId }) => {
   );
 
   const Likes = () => {
-    if (likes.length > 0) {
+    if (likes?.length > 0) {
       return likes.find((item) => item.from === user?.result?.userName) ? (
         <>
           <FavoriteIcon fontSize="small" />
           &nbsp;
-          {likes.length > 2 ? (
+          {likes?.length > 2 ? (
             <span style={{ fontSize: 11 }}>{`You and ${
               likes.length - 1
             } others`}</span>
           ) : (
-            `${likes.length} like${likes.length > 1 ? "s" : ""}`
+            `${likes?.length} like${likes?.length > 1 ? "s" : ""}`
           )}
         </>
       ) : (
         <>
           <FavoriteBorderIcon fontSize="small" />
-          &nbsp;{likes.length} {likes.length === 1 ? "Like" : "Likes"}
+          &nbsp;{likes?.length} {likes?.length === 1 ? "Like" : "Likes"}
         </>
       );
     }
@@ -321,12 +326,9 @@ const Post = ({ setCurrentId, post, currentId }) => {
                     const like = likes.find(
                       (like) => like.from === user?.result?.userName
                     );
-                    try {
-                      const { data } = await api.dislikePost(like._id);
-                      setLikes(likes.filter((like) => like._id !== data));
-                    } catch (error) {
-                      console.log(error);
-                    }
+
+                    dispatch(dislikePost(like._id, post._id));
+
                     if (post.name !== user?.result?.userName) {
                       await dispatch(
                         deleteNotification(
@@ -337,11 +339,13 @@ const Post = ({ setCurrentId, post, currentId }) => {
                       );
                     }
                   } else {
-                    const { data } = await api.likePost({
-                      from: user.result.userName,
-                      likeId: post._id,
-                    });
-                    setLikes([...likes, data]);
+                    dispatch(
+                      likePost({
+                        from: user.result.userName,
+                        likeId: post._id,
+                      })
+                    );
+
                     if (post.name !== user.result.userName) {
                       await dispatch(
                         newNotification({
@@ -369,15 +373,7 @@ const Post = ({ setCurrentId, post, currentId }) => {
                 onClick={() => {
                   handleExpandClick();
                   setCurrentId(post._id);
-                  const getComments = async () => {
-                    try {
-                      const { data } = await api.getComments(post._id);
-                      setComments(data);
-                    } catch (error) {
-                      console.log(error);
-                    }
-                  };
-                  getComments();
+                  dispatch(getComments(post._id));
                 }}
                 aria-expanded={expanded}
                 aria-label="show more"
@@ -447,7 +443,6 @@ const Post = ({ setCurrentId, post, currentId }) => {
                   key={i}
                   comment={comment}
                   setCommentMode={setCommentMode}
-                  setComments={setComments}
                   user={user}
                   comments={comments}
                   deleteNotification={deleteNotification}

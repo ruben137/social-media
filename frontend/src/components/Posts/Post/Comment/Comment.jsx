@@ -9,13 +9,12 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteBorderIcon from "@material-ui/icons/FavoriteBorder";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { Link } from "react-router-dom";
+import { likeComment } from "../../../../actions/posts";
 
 const Comment = ({
   comment,
   setCommentMode,
-  setComments,
   user,
-  comments,
   deleteNotification,
   post,
   newNotification,
@@ -25,7 +24,6 @@ const Comment = ({
   const classes = useStyles();
   const dispatch = useDispatch();
   const [profilePic, setProfilePic] = useState("");
-  const [preventLikeComment, setPreventLikeComment] = useState(true);
 
   useEffect(() => {
     const getProfilePic = async () => {
@@ -61,79 +59,70 @@ const Comment = ({
         <Typography variant="body2" className={classes.comment}>
           {comment.comment}
         </Typography>
-<div className={classes.likeButtonContainer}>
-        <Button
-         style={{border:'1px solid #f1f2f6'}}
-          onClick={async () => {
-            if (!preventLikeComment) return;
-            setPreventLikeComment(false);
-            try {
-              const { data } = await api.likeComment(comment._id);
-              setComments(
-                comments.map((comment) =>
-                  comment._id === data._id ? data : comment
-                )
-              );
-            } catch (error) {
-              console.log(error);
-            }
-            if (comment.name === user?.result?.userName) return;
-            if (comment.likes.includes(user?.result?.userName)) {
-              await dispatch(
-                deleteNotification(
-                  post._id,
-                  user?.result?.userName,
-                  "likeComment"
-                )
-              );
-            } else {
-              await dispatch(
-                newNotification({
-                  notificationId: post._id,
-                  type: "likeComment",
-                  from: user?.result?.userName,
-                  to: comment.from,
-                  notification: `${user?.result?.userName} liked your comment`,
-                })
-              );
-            }
-            setPreventLikeComment(true);
-            socket.emit("send-notification", {
-              notification: "new like",
-              receiver: comment.from,
-            });
-          }}
-        >
-          {comment.likes.find((name) => name === user?.result?.userName) ? (
-            <>
-              <FavoriteIcon fontSize="small" color="secondary" />
-              <span style={{ position: "absolute", right: 13 }}>
-                {comment?.likes?.length}
-              </span>
-            </>
-          ) : (
-            <>
-              <FavoriteBorderIcon fontSize="small" color="secondary" />
-              <span style={{ position: "absolute", right: 13 }}>
-                {comment?.likes?.length > 0 && comment?.likes?.length}
-              </span>
-            </>
-          )}
-        </Button>
-        {comment.from === user?.result?.userName && (
+        <div className={classes.likeButtonContainer}>
           <Button
-            disabled={post.deleting}
-            onClick={(e) => {
-              setCommentMode(true);
-              setCommentId(comment._id);
-              handleProfileMenuOpen(e);
+            style={{ border: "1px solid #f1f2f6" }}
+            onClick={async () => {
+              dispatch(
+                likeComment({ commentId: comment._id, postId: post._id })
+              );
+
+              if (comment.from === user?.result?.userName) return;
+              if (comment.likes.includes(user?.result?.userName)) {
+                await dispatch(
+                  deleteNotification(
+                    post._id,
+                    user?.result?.userName,
+                    "likeComment"
+                  )
+                );
+              } else {
+                await dispatch(
+                  newNotification({
+                    notificationId: post._id,
+                    type: "likeComment",
+                    from: user?.result?.userName,
+                    to: comment.from,
+                    notification: `${user?.result?.userName} liked your comment`,
+                  })
+                );
+              }
+
+              socket.emit("send-notification", {
+                notification: "new like",
+                receiver: comment.from,
+              });
             }}
           >
-            <MoreVertIcon />
+            {comment.likes.find((name) => name === user?.result?.userName) ? (
+              <>
+                <FavoriteIcon fontSize="small" color="secondary" />
+                <span style={{ position: "absolute", right: 13 }}>
+                  {comment?.likes?.length}
+                </span>
+              </>
+            ) : (
+              <>
+                <FavoriteBorderIcon fontSize="small" color="secondary" />
+                <span style={{ position: "absolute", right: 13 }}>
+                  {comment?.likes?.length > 0 && comment?.likes?.length}
+                </span>
+              </>
+            )}
           </Button>
-        )}
-
-</div>
+          {comment.from === user?.result?.userName && (
+            <Button
+              disabled={post.deleting}
+              onClick={(e) => {
+                setCommentMode(true);
+                setCommentId(comment._id);
+                handleProfileMenuOpen(e);
+              }}
+            >
+              <MoreVertIcon />
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   );

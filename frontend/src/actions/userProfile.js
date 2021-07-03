@@ -1,5 +1,5 @@
 import * as api from "../api/index.js";
-import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE, LIKE_USER_PROFILE_COMMENT} from "../constants/actionTypes";
+import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE, LIKE_USER_PROFILE_COMMENT, NO_DATA} from "../constants/actionTypes";
 
 export const follow = (id) => async (dispatch) => {
   dispatch({ type: FOLLOW_REQUEST, payload: { id } });
@@ -21,9 +21,12 @@ export const updateDescription = (id, newDescription) => async (dispatch) => {
   }
 };
 
-export const getUserPosts = (user) => async (dispatch) => {
+export const getUserPosts = (user,skip) => async (dispatch) => {
   try {
-    const { data } = await api.getUserPosts(user);
+    const { data } = await api.getUserPosts(user,skip);
+    if(!data.length){
+      dispatch({type:NO_DATA})
+    }else
     dispatch({ type: FETCH_USER_POST, payload: data });
   } catch (error) {
     console.log(error);

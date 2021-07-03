@@ -8,7 +8,7 @@ const router=express.Router();
 
 router.get('/:skip',auth,getPosts)
 router.get('/notifications/:user',auth,getNotifications)
-router.delete('/notifications/:id/:from/:type',auth,deleteNotification)
+router.delete('/deleteNotification/:id/:from/:type',auth,deleteNotification)
 router.post('/newNotification',newNotification)
 router.post('/',upload.single('image'),createPost)
 router.patch('/:id',auth,updatePost)
