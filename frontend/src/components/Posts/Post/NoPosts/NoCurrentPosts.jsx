@@ -9,7 +9,7 @@ import {
 
 import { useStyles } from "../../styles";
 
-const NoPosts = ({posts}) => {
+const NoCurrentPosts = ({posts}) => {
   const classes = useStyles();
   return (
     <Box className={classes.box}>
@@ -24,7 +24,7 @@ const NoPosts = ({posts}) => {
         >
           <CardContent>
             <Typography style={{ fontSize: 30 }}>
-              Start following people to see their posts!
+              There are no current Posts
             </Typography>
           </CardContent>
         </Card>
@@ -32,5 +32,4 @@ const NoPosts = ({posts}) => {
     </Box>
   );
 };
-
-export default NoPosts;
+export default NoCurrentPosts

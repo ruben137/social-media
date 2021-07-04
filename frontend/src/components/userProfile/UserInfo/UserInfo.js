@@ -1,19 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Container, Typography } from "@material-ui/core";
 import { useStyles } from "../styles";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import FollowButton from "../FollowButton";
 import SettingsModal from "../SettingsModal/Settings";
 import FollowersModal from "../FollowersModal/FollowersModal";
 import FollowingModal from "../FollowingModal/FollowingModal";
+import { getNumberOfPosts } from "../../../actions/userProfile";
 
 const UserInfo = ({ setFollowing }) => {
   const classes = useStyles();
+  const dispatch = useDispatch()
   const logUser = JSON.parse(localStorage.getItem("profile"));
-  const user = useSelector((state) => state.user);
+  const {user }= useSelector((state) => state.userState);
   const params = useParams();
-  const userPosts = useSelector((state) => state.userPosts);
+  const {postsNumber} = useSelector((state) => state.userPosts);
+  useEffect(()=>{
+    dispatch(getNumberOfPosts(user?.userName))
+  },[dispatch,user?.userName])
 
   return (
     <Container className={classes.descriptionContainer}>
@@ -33,7 +38,7 @@ const UserInfo = ({ setFollowing }) => {
         </div>
         <div>
           <p align="center" style={{ fontWeight: 700 }}>
-            {userPosts?.length ? userPosts?.length : 0}
+             {postsNumber}
             <br /> <span style={{ fontWeight: 300 }}>posts</span>
           </p>
         </div>

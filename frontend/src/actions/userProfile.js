@@ -1,10 +1,11 @@
 import * as api from "../api/index.js";
-import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE_USER_PROFILE_COMMENT, NO_DATA,GET_PROFILE_PIC, CLEAN_USER_PROFILE_STATE} from "../constants/actionTypes";
+import { FETCH_USER_POST, FOLLOW, FOLLOW_REQUEST, UPDATE_DESCRIPTION ,GET_USER_POST,LIKE_USER_POST,DISLIKE_USER_POST,COMMENT_USER_POST, DELETE_USER_PROFILE_COMMENT, LIKE_USER_PROFILE_COMMENT, NO_DATA,GET_PROFILE_PIC, CLEAN_USER_PROFILE_STATE,GET_FOLLOWERS,GET_FOLLOWING, NO_FOLLOWERS_DATA, CLEAN_FOLLOWER_STATE,GET_POSTS_NUMBER} from "../constants/actionTypes";
 
 export const follow = (id) => async (dispatch) => {
   dispatch({ type: FOLLOW_REQUEST, payload: { id } });
   try {
     const { data } = await api.follow(id);
+ 
     dispatch({ type: FOLLOW, payload: data });
   } catch (error) {
     console.log(error);
@@ -32,6 +33,15 @@ export const getUserPosts = (user,skip) => async (dispatch) => {
     console.log(error);
   }
 };
+
+export const getNumberOfPosts=(user)=>async(dispatch)=>{
+  try {
+    const {data}=await api.getNumberOfPosts(user)
+    dispatch({type:GET_POSTS_NUMBER,payload:data})
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 
 export const getUserPost = (id) => async (dispatch) => {
@@ -107,10 +117,35 @@ export const likePost=(id)=>async(dispatch)=>{
      console.log(error)
    }
  }
+export const getFollowers = (user, skip) => async (dispatch) => {
+  try {
+    const { data } = await api.getFollowers(user, skip);
 
- export const clearUserProfileState=()=>async(dispatch)=>{
+    if (data.length) dispatch({ type: GET_FOLLOWERS, payload: data });
+    if (!data.length || data.length<7) dispatch({ type: NO_FOLLOWERS_DATA });
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getFollowing=(user,skip)=>async(dispatch)=>{
+  try {
+    const {data}=await api.getFollowing(user,skip)
+    if(data.length)dispatch({type:GET_FOLLOWING,payload:data})
+      if (!data.length) dispatch({ type: NO_FOLLOWERS_DATA });
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const clearFollowerState=()=>async(dispatch)=>{
+  try {
+    dispatch({type:CLEAN_FOLLOWER_STATE})
+  } catch (error) {
+    console.log(error)
+  }
+}
+ export const clearUserProfileState=(user)=>async(dispatch)=>{
    try {
-     dispatch({type:CLEAN_USER_PROFILE_STATE})
+     dispatch({type:CLEAN_USER_PROFILE_STATE,payload:user})
    } catch (error) {
      console.log(error)
    }

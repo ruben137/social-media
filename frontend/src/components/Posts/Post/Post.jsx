@@ -105,7 +105,7 @@ const Post = ({ post }) => {
     setCommentData("");
     if (post.name !== user?.result?.userName) {
       await dispatch(
-        deleteNotification(post._id, user?.result?.userName, "comment")
+        deleteNotification({_id:post._id, from:user?.result?.userName, type:"comment"})
       );
       socket.emit("send-notification", {
         notification: "new comment",
@@ -332,9 +332,9 @@ const Post = ({ post }) => {
                     if (post.name !== user?.result?.userName) {
                       await dispatch(
                         deleteNotification(
-                          post._id,
-                          user?.result?.userName,
-                          "like"
+                         { _id:post._id,
+                          from:user?.result?.userName,
+                          type:"like"}
                         )
                       );
                     }

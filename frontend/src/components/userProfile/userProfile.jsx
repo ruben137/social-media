@@ -26,7 +26,8 @@ const UserProfile = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const loader = useRef()
-  const user = useSelector((state) => state.user);
+  const userState = useSelector((state) => state.userState);
+  const {user}=userState
   const [skip, setSkip] = useState(0);
   const { userPosts } = useInfinityScrollProfile(skip, params.id, dispatch)
 
@@ -45,7 +46,7 @@ const UserProfile = () => {
   useEffect(() => {
     dispatch(getUser(params?.id));
     return () => {
-      dispatch(clearUserProfileState())
+      dispatch(clearUserProfileState(params?.id))
       setSkip(0)
     }
   }, [dispatch, params?.id]);
@@ -55,7 +56,7 @@ const UserProfile = () => {
   const handleObserver = useCallback((entries) => {
     const target = entries[0];
     if (target.isIntersecting) {
-      setSkip((prev) => prev + 5);
+      setSkip((prev) => prev + 6);
     }
   }, []);
 

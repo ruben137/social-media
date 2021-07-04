@@ -1,24 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { Fade, Paper, Typography} from "@material-ui/core";
 import UserFollowing from "./UserFollowing/UserFollowing";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 import { useStyles } from "../styles";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearFollowerState, getFollowing } from "../../../actions/userProfile";
+import { useInfinityScrollFollowing } from "../../../customHooks/useInfinityScroll";
+import { useHookWithRefCallback } from "../../../customHooks/useRefCallback";
 
 export default function TransitionsModal() {
+  const dispatch = useDispatch()
   const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
-  const user = useSelector((state) => state.user);
-  const {following}=user
+  const [open, setOpen] = useState(false);
+   const [skip, setSkip] = useState(0);
+  const userState = useSelector((state) => state.userState);
+  const {user}=userState
+  const {following}=useInfinityScrollFollowing(skip,user.userName,dispatch,open)
+  const [ref] = useHookWithRefCallback(setSkip);
 
 
   const handleOpen = () => {
     setOpen(true);
+   
   };
 
   const handleClose = () => {
     setOpen(false);
+    setSkip(0);
+    dispatch(clearFollowerState());
   };
 
   return (
@@ -58,6 +68,9 @@ export default function TransitionsModal() {
               {following?.map((following,i) => (
               <UserFollowing following={following} handleClose={handleClose} key={i}/>
               ))}
+              <div 
+              style={{ display: following?.length ? "block" : "none" }}
+              ref={ref}/>
             </ul>
           </Paper>
         </Fade>

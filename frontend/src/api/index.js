@@ -2,10 +2,11 @@ import axios from "axios";
 
 const API = axios.create({ baseURL: "http://localhost:5000" });
 
-
 API.interceptors.request.use((req) => {
-  if (localStorage.getItem('profile')) {
-    req.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('profile')).token}`;
+  if (localStorage.getItem("profile")) {
+    req.headers.Authorization = `Bearer ${
+      JSON.parse(localStorage.getItem("profile")).token
+    }`;
   }
 
   return req;
@@ -28,8 +29,9 @@ export const likeComment = (id) => API.patch(`/comments/${id}`);
 
 // User
 export const getUsers = () => API.get("/userProfile");
-export const getUser = (user) => API.get(`/userProfile/${user}`);
-export const getUserPosts = (user,skip) => API.get(`/userProfile/userPosts/${user}/${skip}`);
+export const getUser = (user) => API.get(`/userProfile/getUser/${user}`);
+export const getUserPosts = (user, skip) =>
+  API.get(`/userProfile/userPosts/${user}/${skip}`);
 export const follow = (id) => API.put(`/userProfile/follow/${id}`);
 export const getUserNotifications = (user) =>
   API.get(`/posts/notifications/${user}`);
@@ -42,6 +44,12 @@ export const updateProfilePic = (pic) =>
     },
   });
 export const getProfilePic = (user) => API.get(`/userProfile/getpic/${user}`);
+export const getFollowers = (user, skip) =>
+  API.get(`/userProfile/followers/${user}/${skip}`);
+export const getFollowing = (user, skip) =>
+  API.get(`/userProfile/following/${user}/${skip}`);
+export const getNumberOfPosts = (user) =>
+  API.get(`/userProfile/postsNumber/${user}`);
 
 // Navigation
 export const searchUser = (query) => API.get(`/userProfile/search/${query}`);

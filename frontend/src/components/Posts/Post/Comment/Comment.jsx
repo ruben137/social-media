@@ -71,9 +71,9 @@ const Comment = ({
               if (comment.likes.includes(user?.result?.userName)) {
                 await dispatch(
                   deleteNotification(
-                    post._id,
-                    user?.result?.userName,
-                    "likeComment"
+                   { _id:post._id,
+                    from:user?.result?.userName,
+                    type:"likeComment"}
                   )
                 );
               } else {

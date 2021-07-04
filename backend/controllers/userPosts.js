@@ -174,5 +174,50 @@ export const getProfilePic = async (req, res) => {
     res.status(200).json(user.profilePic);
   } catch (error) {
     res.status(404).json({ message: error.message });
+    console.log(error)
   }
 };
+
+
+
+export const getFollowers=async(req,res)=>{
+  const {skip,user}=req.params
+  try {
+      const followers=await userModel
+      .find({following:{$in:[user]}})
+      .skip(+skip)
+      .limit(7)
+      res.status(200).json(followers)
+  } catch (error) {
+       res.status(404).json({ message: error.message });
+    console.log(error)
+  }
+}
+
+export const getFollowing=async(req,res)=>{
+  const {skip,user}=req.params
+  try {
+    const following=await userModel
+    .find({followers:{$in:[user]}})
+    .skip(+skip)
+    .limit(7)
+    res.status(200).json(following)
+  } catch (error) {
+         res.status(404).json({ message: error.message });
+    console.log(error)
+  }
+}
+
+export const getNumberOfPosts = async (req, res) => {
+  const { name } = req.params;
+  try {
+    const user = await userModel.findOne({ userName: name });
+    res.status(200).json(user.posts);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+    console.log(error);
+  }
+};
+
+
+

@@ -8,9 +8,10 @@ import mongoose from "mongoose";
 const unlinkAsync = promisify(fs.unlink);
 
 export const getPosts = async (req, res) => {
+  const user = await userModel.findOne({ userName: req.userId });
   try {
     const posts = await postModel
-      .find()
+      .find({ name: { $in: [...user.following,req.userId] } })
       .skip(+req.params.skip)
       .limit(5)
       .sort({ createdAt: -1 });
@@ -21,9 +22,11 @@ export const getPosts = async (req, res) => {
   }
 };
 
+
 export const createPost = async (req, res) => {
   const post = req.body;
-
+  const user = await userModel.findOne({ userName: post.name });
+  user.number++
   const newPostModel = new postModel({
     ...post,
     createdAt: new Date().toISOString(),
@@ -36,7 +39,7 @@ export const createPost = async (req, res) => {
 
   try {
     await newPostModel.save();
-
+    await userModel.findByIdAndUpdate(user._id,user,{new:true})
     res.status(201).json(newPostModel);
   } catch (error) {
     res.status(409).json({ message: error.message });
@@ -46,12 +49,14 @@ export const createPost = async (req, res) => {
 export const deletePost = async (req, res) => {
   const { id } = req.params;
   const post = await postModel.findById(id);
+  const user = await userModel.findOne({ userName: post.name });
+  user.posts--
   const arr = post.url.split("/");
   await unlinkAsync(`storage/imgs/${arr[arr.length - 1]}`);
   if (!mongoose.Types.ObjectId.isValid(id))
     return res.status(404).send("no post with that id");
   await postModel.findByIdAndRemove(id);
-
+  await userModel.findByIdAndUpdate(user._id,user,{new:true})
   res.json({ message: "Post deleted succesfully" });
 };
 
@@ -214,4 +219,5 @@ export const deleteNotification = async (req, res) => {
     console.log(error);
   }
 };
+
 

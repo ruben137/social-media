@@ -1,30 +1,40 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { Fade, Paper, Typography } from "@material-ui/core";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useStyles } from "../styles";
 import Follower from "./Follower/Follower";
 
+import { useInfinityScrollFollowers } from "../../../customHooks/useInfinityScroll";
+import { clearFollowerState } from "../../../actions/userProfile";
+import { useHookWithRefCallback } from "../../../customHooks/useRefCallback";
+
 export default function FollowingModal() {
+  const dispatch = useDispatch();
   const classes = useStyles();
-  const user = useSelector((state) => state.user);
-  const { followers } = user;
+  const userState = useSelector((state) => state.userState);
+  const [skip, setSkip] = useState(0);
+  const { user } = userState;
 
-  const [open, setOpen] = React.useState(false);
-
+  const [open, setOpen] = useState(false);
+  const { followers } = useInfinityScrollFollowers(skip, user.userName,dispatch,open);
+  const [ref] = useHookWithRefCallback(setSkip);
+ 
   const handleOpen = () => {
     setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
+    setSkip(0);
+    dispatch(clearFollowerState());
   };
 
   return (
-    <div>
+    <>
       <p
         align="center"
         style={{ fontWeight: 700, cursor: "pointer" }}
@@ -63,10 +73,14 @@ export default function FollowingModal() {
                   key={i}
                 />
               ))}
+              <div
+                style={{ display: followers.length ? "block" : "none" }}
+                ref={ref}
+              />
             </ul>
           </Paper>
         </Fade>
       </Modal>
-    </div>
+    </>
   );
 }

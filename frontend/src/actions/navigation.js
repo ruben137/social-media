@@ -16,15 +16,11 @@ export const searchUser = (query) => async (dispatch) => {
 };
 
 export const deleteNotification =
-  ({ _id, from, type, socket, receiver }) =>
+  ({ _id, from, type }) =>
   async (dispatch) => {
     try {
       await api.deleteNotification(_id, from, type);
-      if (socket)
-        socket.emit("send-notification", {
-          notification: "new comment",
-          receiver,
-        });
+
 
       dispatch({ type: DELETE_NOTIFICATION, payload: _id });
     } catch (error) {

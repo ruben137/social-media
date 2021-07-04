@@ -10,8 +10,9 @@ const userSchema=mongoose.Schema({
   followers:{type:Array,default:[]},
   following:{type:Array,default:[]},
   description:String,
-  isAdmin:{type:Boolean,default:false}
-
+  isAdmin:{type:Boolean,default:false},
+  posts:{type:Number,defaul:0}
+  
 
 
 })

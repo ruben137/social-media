@@ -7,7 +7,8 @@ import {
   LIKE_USER_POST,
    LIKE_USER_PROFILE_COMMENT,
    NO_DATA,
-   CLEAN_USER_PROFILE_STATE
+   CLEAN_USER_PROFILE_STATE,
+   GET_POSTS_NUMBER
 } from "../constants/actionTypes";
 import { GET_USER_POST } from "../constants/actionTypes";
 
@@ -16,10 +17,11 @@ const initialState = {
   userPost: {
     likes: [],
     comments: [],
-  
   },
+  followers:[],
   noMore: false,
-  users:[]
+  users:[],
+  postsNumber:0
 };
 export const userPosts = (state = initialState, action) => {
   switch (action.type) {
@@ -27,6 +29,11 @@ export const userPosts = (state = initialState, action) => {
       return {
         ...state,
         userPosts: [...state.userPosts, ...action.payload],
+      };
+    case GET_POSTS_NUMBER:
+      return {
+        ...state,
+        postsNumber: action.payload,
       };
     case NO_DATA:
       return {
@@ -92,8 +99,20 @@ export const userPosts = (state = initialState, action) => {
           { name: action.user, profilePic: action.payload },
         ],
       };
+
     case CLEAN_USER_PROFILE_STATE:
-      return state=initialState
+      return {
+        ...state,
+        userPosts: [],
+        userPost: {
+          likes: [],
+          comments: [],
+        },
+        followers: [],
+        noMore: false,
+        users: state.users.filter((user) => user.userName !== action.payload),
+        postsNumber: 0,
+      };
 
     default:
       return state;

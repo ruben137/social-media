@@ -1,18 +1,10 @@
-import React, { useEffect } from "react";
+import React  from "react";
 import { Typography, Avatar } from "@material-ui/core";
 import { useStyles } from "../../styles";
 import { Link } from "react-router-dom";
-import { getProfilePic } from "../../../../actions/userProfile";
-import { useDispatch, useSelector } from "react-redux";
-const Follower = ({follower,handleClose}) => {
+
+const Follower = ({ follower, handleClose ,setLoader}) => {
   const classes = useStyles();
-    const dispatch=useDispatch()
-  const userPostsState = useSelector((state) => state.userPosts);
-  const { users } = userPostsState;
-  const user = users.find((user) => user.name === follower);
-  useEffect(()=>{
-    dispatch(getProfilePic(follower))
-  },[dispatch,follower])
 
   return (
     <li className={classes.li}>
@@ -33,12 +25,12 @@ const Follower = ({follower,handleClose}) => {
             }}
             variant="body2"
             component={Link}
-            to={`/profile/${follower}`}
+            to={`/profile/${follower.userName}`}
             onClick={handleClose}
           >
-            {follower}
+            {follower.userName}
           </Typography>
-          <Avatar src={user?.profilePic} />
+          <Avatar src={follower?.profilePic} />
         </div>
       </div>
     </li>

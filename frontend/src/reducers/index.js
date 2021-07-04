@@ -9,7 +9,7 @@ import {user }from './user'
 import {users }from './users'
 import {search} from './search'
 
-export const reducers = combineReducers({ postsState:posts ,auth,userPosts,notifications,user,users,search})
+export const reducers = combineReducers({ postsState:posts ,auth,userPosts,notifications,userState:user,users,search})
 
 
 

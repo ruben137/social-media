@@ -36,7 +36,6 @@ export default function PrimarySearchAppBar() {
   const userPostsState = useSelector((state) => state.userPosts);
   const { users } = userPostsState;
 
- 
   const notifications = useSelector((state) => state.notifications);
   const messageNotifications = notifications.filter(
     (notification) => notification.type === "message"
@@ -44,7 +43,9 @@ export default function PrimarySearchAppBar() {
 
   const search = useSelector((state) => state.search);
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("profile")));
-  const currentUser = users.find((item) => item.name === user?.result?.userName);
+  const currentUser = users.find(
+    (item) => item.name === user?.result?.userName
+  );
 
   const [showSearch, setShowSearch] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -68,8 +69,8 @@ export default function PrimarySearchAppBar() {
   }, []);
 
   useEffect(() => {
-  dispatch(getProfilePic(user?.result?.userName))
-  }, [])
+    if(user?.result?.userName)dispatch(getProfilePic(user?.result?.userName));
+  }, [dispatch, user?.result?.userName]);
 
   const handleClick = (e) => {
     if (node?.current?.contains(e.target)) {

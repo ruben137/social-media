@@ -4,11 +4,12 @@ import Post from "./Post/Post";
 import { useSelector, useDispatch } from "react-redux";
 import { Card, CardContent, Typography } from "@material-ui/core";
 import LoadingPost from "./Post/LoadingPost";
-import { getUser } from "../../actions/posts";
+import { getUser, cleanPostState } from "../../actions/posts";
 import { useStyles } from "./styles";
 import { useHistory } from "react-router";
 import useInfinityScroll from "../../customHooks/useInfinityScroll";
 import NoPosts from "./Post/NoPosts/NoPosts";
+import NoCurrentPosts from "./Post/NoPosts/NoCurrentPosts";
 
 const Posts = () => {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ const Posts = () => {
 
   const [skip, setSkip] = useState(0);
   const [currentId, setCurrentId] = useState(0);
-  const { posts ,noMore} = useInfinityScroll(skip, dispatch);
+  const { posts, noMore, loading } = useInfinityScroll(skip, dispatch);
 
   useEffect(() => {
     if (!logUser) {
@@ -30,6 +31,10 @@ const Posts = () => {
 
   useEffect(() => {
     dispatch(getUser(logUser?.result?.userName));
+    return () => {
+      dispatch(cleanPostState());
+      setSkip(0);
+    };
   }, [dispatch, logUser?.result?.userName]);
 
   const handleObserver = useCallback((entries) => {
@@ -38,8 +43,6 @@ const Posts = () => {
       setSkip((prev) => prev + 5);
     }
   }, []);
-
-
 
   useEffect(() => {
     const option = {
@@ -51,34 +54,24 @@ const Posts = () => {
     if (loader.current) observer.observe(loader.current);
   }, [handleObserver]);
 
-  const filterPosts = posts?.filter(
-    (post) =>
-      user?.following?.some((u) => u === post.name) ||
-      post.name === logUser?.result?.userName
-  );
-
   return (
     <>
       {logUser?.result ? (
         <Form currentId={currentId} setCurrentId={setCurrentId} />
       ) : null}
 
-      {!posts.length ? <LoadingPost user={user} /> : <span></span>}
-      {user?.following?.length<1&&<NoPosts/>}
+      {loading && <LoadingPost user={user} />}
+      {user?.following?.length < 1 && <NoPosts />}
+      {!posts.length && !loading && <NoCurrentPosts />}
       <div className={classes.postsContainer}>
-        {filterPosts.map((post, i) => (
-          <Post
-            key={i}
-            post={post}
-      
-            currentId={currentId}
-          />
+        {posts.map((post, i) => (
+          <Post key={i} post={post} currentId={currentId} />
         ))}
         <div
           style={{ display: posts.length ? "block" : "none" }}
           ref={loader}
         />
-        {noMore ? (
+        {noMore &&skip ? (
           <Card align="center" className={classes.noMore}>
             <CardContent>
               <Typography>There are no more posts to show</Typography>
@@ -88,7 +81,6 @@ const Posts = () => {
           <span></span>
         )}
       </div>
-
     </>
   );
 };

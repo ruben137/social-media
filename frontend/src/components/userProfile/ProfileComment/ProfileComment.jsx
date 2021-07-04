@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { deleteComment, likeComment } from "../../../actions/userProfile";
 
-
 const ProfileComment = ({
   comment,
   user,
@@ -20,8 +19,7 @@ const ProfileComment = ({
   logUser,
   setCommentData,
   setIndex,
-  setOpen
-
+  setOpen,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const handleMenuOpen = (e) => {
@@ -39,11 +37,11 @@ const ProfileComment = ({
 
     if (comment.likes.includes(user?.result?.userName)) {
       await dispatch(
-        deleteNotification(
-          userPosts[index]._id,
-          logUser?.result?.userName,
-          "likeComment"
-        )
+        deleteNotification({
+          _id: userPosts[index]._id,
+          from: logUser?.result?.userName,
+          type: "likeComment",
+        })
       );
     } else {
       console.log(comment.from);
@@ -63,21 +61,22 @@ const ProfileComment = ({
       receiver: comment.from,
     });
   };
-  const deleteCurrentComment = async() => {
+  const deleteCurrentComment = async () => {
     setAnchorEl(null);
     dispatch(deleteComment(commentId));
 
     setCommentData("");
     dispatch(
-      deleteNotification(
-{        id:userPosts[index]._id,
-        from:logUser?.result?.userName,
-        type:"comment",
-        socket,
-        receiver:userPosts[index].name}
-      )
+      deleteNotification({
+        _id: userPosts[index]._id,
+        from: logUser?.result?.userName,
+        type: "comment",
+      })
     );
-
+    socket.emit("send-notification", {
+      notification: "new comment",
+      receiver: userPosts[index].name,
+    });
   };
   const isMenuOpen = Boolean(anchorEl);
   const menuId = "primary-search-account-menu";
@@ -111,7 +110,7 @@ const ProfileComment = ({
         component={Link}
         to={`/profile/${comment.from}`}
         onClick={() => {
-          setOpen(false)
+          setOpen(false);
           setIndex(null);
         }}
         style={{

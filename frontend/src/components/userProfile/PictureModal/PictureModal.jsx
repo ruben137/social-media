@@ -164,9 +164,9 @@ export default function PictureModal({ img, userPosts, currentIndex }) {
                       if (userPosts[index].name !== logUser.result.userName) {
                         await dispatch(
                           deleteNotification(
-                            userPosts[index]?._id,
-                            logUser.result.userName,
-                            "like"
+                        {    _id:userPosts[index]?._id,
+                            from:logUser.result.userName,
+                            type:"like"}
                           )
                         );
                       }

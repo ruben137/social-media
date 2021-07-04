@@ -22,7 +22,7 @@ const Sidebar = () => {
   const [conversations, setConversations] = useState([]);
   const [zIndex, setzIndex] = useState(0);
   const users = useSelector((state) => state.users);
-  const currentUser = useSelector((state) => state.user);
+  const currentUser = useSelector((state) => state.userState);
 
   const [showConversations, setShowConversations] = useState(true);
   const [showContacts, setShowContacts] = useState(false);
@@ -67,7 +67,7 @@ const Sidebar = () => {
   const filterMessages = lastMessages.map((item) => item.conversationId);
 
   const contacts = users.filter((user) =>
-    currentUser?.following?.includes(user.userName)
+    currentUser?.user?.following?.includes(user.userName)
   );
 
   useEffect(() => {
@@ -205,26 +205,25 @@ const Sidebar = () => {
           )}
           {showConversations && (
             <div style={{ background: "white" }}>
-              {
-                conversations?.map((conversation,i) => (
-                    <Conversation
-                      key={i}
-                      conversation={conversation}
-                      setCurrentConversation={setCurrentConversation}
-                      deleteMessageNotifications={deleteMessageNotifications}
-                      setMessages={setMessages}
-                      setProfilePic={setProfilePic}
-                      setMessageTo={setMessageTo}
-                      DoDecrypt={DoDecrypt}
-                      setzIndex={setzIndex}
-                      logUser={logUser}
-                      lastMessages={lastMessages}
-                      filterMessages={filterMessages}
-                      profilePic={profilePic}
-                      handleMenuOpen={handleMenuOpen}
-                      setConversationId={setConversationId}
-                    />
-                  ))}
+              {conversations?.map((conversation, i) => (
+                <Conversation
+                  key={i}
+                  conversation={conversation}
+                  setCurrentConversation={setCurrentConversation}
+                  deleteMessageNotifications={deleteMessageNotifications}
+                  setMessages={setMessages}
+                  setProfilePic={setProfilePic}
+                  setMessageTo={setMessageTo}
+                  DoDecrypt={DoDecrypt}
+                  setzIndex={setzIndex}
+                  logUser={logUser}
+                  lastMessages={lastMessages}
+                  filterMessages={filterMessages}
+                  profilePic={profilePic}
+                  handleMenuOpen={handleMenuOpen}
+                  setConversationId={setConversationId}
+                />
+              ))}
             </div>
           )}
         </div>

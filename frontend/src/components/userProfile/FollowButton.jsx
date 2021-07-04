@@ -22,15 +22,17 @@ const FollowButton = ({ user, logUser }) => {
         variant="contained"
         fullWidth
         onClick={async () => {
+          if (logUser?.result?.userName === user.userName) return;
           if (!loading) {
             await dispatch(follow(user?._id));
             await dispatch(
-              deleteNotification(user._id, logUser?.result?.userName, "follow")
+              deleteNotification({_id:user._id, from:logUser?.result?.userName, type:"follow"})
             );
-            socket.emit("send-notification", {
+              socket.emit("send-notification", {
               notification: "new follow",
               receiver: user.userName,
             });
+    
           }
         }}
       >
@@ -46,6 +48,7 @@ const FollowButton = ({ user, logUser }) => {
         variant="contained"
         fullWidth
         onClick={async () => {
+          if (logUser?.result?.userName === user.userName) return;
           if (!loading) {
             await dispatch(follow(user?._id));
             await dispatch(
@@ -79,8 +82,8 @@ const FollowButton = ({ user, logUser }) => {
           cursor: "pointer",
         }}
         onClick={async () => {
+          if (logUser?.result?.userName === user.userName) return;
           if (!loading) {
-            console.log(user);
             await dispatch(follow(user?._id));
             await dispatch(
               newNotification({

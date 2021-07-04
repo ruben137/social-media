@@ -10,19 +10,28 @@ DELETE_COMMENT,
   LIKE_COMMENT,
   GET_LIKES,
   LIKE_POST,
-  DISLIKE_POST
+  DISLIKE_POST,
+  CLEAN_POST_STATE,
+  GET_POSTS_REQUEST
 } from "../constants/actionTypes";
 
 const initialState = {
   posts: [],
   noMore:false,
-  tryna:false
+  loading:false
+
 };
 
 export const posts = (state = initialState, action) => {
   switch (action.type) {
+    case GET_POSTS_REQUEST:
+   
+      return{
+        ...state,
+        loading:true
+      }
     case FETCH_ALL:
-      return { ...state, posts: [...state.posts, ...action.payload] };
+      return { ...state, posts: [...state.posts, ...action.payload],loading:false };
     case FETCH_MORE:
       return {
         ...state,
@@ -42,6 +51,7 @@ export const posts = (state = initialState, action) => {
     case NO_DATA:
       return {
         ...state,
+        loading:false,
         noMore: action.payload,
       };
     case GET_LIKES:
@@ -115,6 +125,8 @@ export const posts = (state = initialState, action) => {
             : post
         ),
       };
+    case CLEAN_POST_STATE:
+      return state=initialState
 
     default:
       return state;
